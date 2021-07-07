@@ -42,7 +42,14 @@ func test(writer http.ResponseWriter, request *http.Request) {
 	} else {
 		_, _ = writer.Write([]byte(err.Error()))
 
-		go_gcloud_engine.WriteLogError(Env, request, "Test write error: %v", err)
+		go_gcloud_engine.WriteLogError(Env, request, "RequestCustomer error: %v", err)
+	}
+
+	_, err = go_gcloud_engine.AddNewTaskQueue(Env, request, "/queue-api-demo", map[string][]string{"abc": {"test"}, "dev": {"true"}}, "")
+	if err != nil {
+		_, _ = writer.Write([]byte(err.Error()))
+
+		go_gcloud_engine.WriteLogError(Env, request, "AddNewTaskQueue error: %v", err)
 	}
 }
 ```
