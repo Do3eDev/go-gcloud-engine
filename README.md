@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"github.com/Do3eDev/go-gcloud-engine"
-	"google.golang.org/appengine"
 	"net/http"
 )
 
@@ -16,7 +15,7 @@ var Env = "staging"
 
 func main() {
 	http.HandleFunc("/", test)
-	appengine.Main()
+	go_gcloud_engine.AppEngineMain()
 }
 
 func test(writer http.ResponseWriter, request *http.Request) {
