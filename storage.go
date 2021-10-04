@@ -7,6 +7,8 @@ import (
 )
 
 func StorageCreateFile(Url, Env string, request *http.Request, Bucket, fileName string, content []byte) {
+	Url += "/StorageCreateFile"
+
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileName string `json:"file_name"`
@@ -44,6 +46,8 @@ func StorageCreateFile(Url, Env string, request *http.Request, Bucket, fileName 
 }
 
 func StorageCreateFileSVG(Url, Env string, request *http.Request, Bucket, fileName string, content []byte) {
+	Url += "/StorageCreateFileSVG"
+
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileName string `json:"file_name"`
@@ -84,6 +88,8 @@ func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket strin
 	Name string
 	Data []byte
 }) {
+	Url += "/StorageCreateMultiFile"
+
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileList []struct {
@@ -124,6 +130,8 @@ func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket strin
 }
 
 func StorageDeleteFile(Url, Env string, request *http.Request, Bucket string, fileName string) {
+	Url += "/StorageDeleteFile"
+
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileName string `json:"file_name"`
@@ -152,6 +160,8 @@ func StorageDeleteFile(Url, Env string, request *http.Request, Bucket string, fi
 }
 
 func StorageReadFile(Url, Env string, request *http.Request, Bucket string, fileName string) ([]byte, error) {
+	Url += "/StorageReadFile"
+
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileName string `json:"file_name"`
@@ -186,6 +196,8 @@ func StorageReadFile(Url, Env string, request *http.Request, Bucket string, file
 }
 
 func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fileName string) bool {
+	Url += "/StorageCheckFile"
+
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileName string `json:"file_name"`
@@ -227,6 +239,8 @@ func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fil
 }
 
 func StorageDeleteMultiFile(Url, Env string, request *http.Request, Bucket string, array1 []string) {
+	Url += "/StorageDeleteMultiFile"
+
 	var data1 struct {
 		Bucket     string   `json:"bucket"`
 		ListDelete []string `json:"list_delete"`
