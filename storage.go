@@ -10,15 +10,15 @@ func StorageCreateFile(Url, Env string, request *http.Request, Bucket, fileName 
 	Url += "/StorageCreateFile"
 
 	var data1 struct {
-		Bucket   string `json:"bucket"`
-		FileName string `json:"file_name"`
-		Content  string `json:"content"`
-		TimeNow  string `json:"time_now"`
+		Bucket   string      `json:"bucket"`
+		FileName string      `json:"file_name"`
+		Content  interface{} `json:"content"`
+		TimeNow  string      `json:"time_now"`
 	}
 
 	data1.Bucket = Bucket
 	data1.FileName = fileName
-	data1.Content = string(content)
+	_ = json.Unmarshal(content, &data1.Content)
 	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
 
 	var body1, _ = json.Marshal(data1)
@@ -49,15 +49,15 @@ func StorageCreateFileSVG(Url, Env string, request *http.Request, Bucket, fileNa
 	Url += "/StorageCreateFileSVG"
 
 	var data1 struct {
-		Bucket   string `json:"bucket"`
-		FileName string `json:"file_name"`
-		Content  string `json:"content"`
-		TimeNow  string `json:"time_now"`
+		Bucket   string      `json:"bucket"`
+		FileName string      `json:"file_name"`
+		Content  interface{} `json:"content"`
+		TimeNow  string      `json:"time_now"`
 	}
 
 	data1.Bucket = Bucket
 	data1.FileName = fileName
-	data1.Content = string(content)
+	_ = json.Unmarshal(content, &data1.Content)
 	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
 
 	var body1, _ = json.Marshal(data1)
@@ -85,16 +85,16 @@ func StorageCreateFileSVG(Url, Env string, request *http.Request, Bucket, fileNa
 }
 
 func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket string, fList []struct {
-	Name string
-	Data []byte
+	Name string `json:"name"`
+	Data []byte `json:"data"`
 }) {
 	Url += "/StorageCreateMultiFile"
 
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileList []struct {
-			Name string
-			Data []byte
+			Name string `json:"name"`
+			Data []byte `json:"data"`
 		} `json:"file_list"`
 		TimeNow string `json:"time_now"`
 	}
