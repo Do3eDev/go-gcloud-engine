@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
 	"net/http"
 )
@@ -31,14 +30,8 @@ func RequestCustomer(Env string, method string, url string, body []byte, header 
 	}
 	var resp *http.Response
 
-	if Env != "local" {
-		ctx := appengine.NewContext(request)
-		client := urlfetch.Client(ctx)
-		resp, err = client.Do(req)
-	} else {
-		client := http.DefaultClient
-		resp, err = client.Do(req)
-	}
+	client := http.DefaultClient
+	resp, err = client.Do(req)
 
 	if err != nil {
 		status = 2

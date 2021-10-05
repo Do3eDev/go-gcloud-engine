@@ -4,17 +4,19 @@ import (
 	"bytes"
 	"cloud.google.com/go/storage"
 	"compress/gzip"
-	"google.golang.org/appengine"
+	"context"
 	"io"
 	"io/ioutil"
 	"net/http"
 )
 
+var ctx = context.Background()
+
 func StorageCreateFile(Env string, request *http.Request, Bucket, fileName string, content []byte) {
 	if Env == "local" {
 		return
 	}
-	var ctx = appengine.NewContext(request)
+
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
 		return
@@ -36,7 +38,7 @@ func StorageCreateFileSVG(Env string, request *http.Request, Bucket, fileName st
 	if Env == "local" {
 		return
 	}
-	var ctx = appengine.NewContext(request)
+
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
 		return
@@ -61,7 +63,7 @@ func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fL
 	if Env == "local" {
 		return
 	}
-	var ctx = appengine.NewContext(request)
+
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
 		return
@@ -85,7 +87,7 @@ func StorageDeleteFile(Env string, request *http.Request, Bucket string, fileNam
 	if Env == "local" {
 		return
 	}
-	var ctx = appengine.NewContext(request)
+
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
 		return
@@ -97,7 +99,7 @@ func StorageDeleteFile(Env string, request *http.Request, Bucket string, fileNam
 }
 
 func StorageReadFile(Env string, request *http.Request, Bucket string, fileName string) ([]byte, error) {
-	var ctx = appengine.NewContext(request)
+
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
 		return nil, err
@@ -117,7 +119,7 @@ func StorageCheckFile(Env string, request *http.Request, Bucket string, fileName
 	if Env == "local" {
 		return false
 	}
-	var ctx = appengine.NewContext(request)
+
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
 		return false
@@ -135,7 +137,7 @@ func StorageDeleteMultiFile(Env string, request *http.Request, Bucket string, ar
 	if Env == "local" {
 		return
 	}
-	var ctx = appengine.NewContext(request)
+
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
 		return
