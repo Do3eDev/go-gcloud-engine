@@ -57,8 +57,8 @@ func StorageCreateFileSVG(Env string, request *http.Request, Bucket, fileName st
 }
 
 func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fList []struct {
-	Name string
-	Data []byte
+	Name string `json:"name"`
+	Data []byte `json:"data"`
 }) {
 	if Env == "local" {
 		return
