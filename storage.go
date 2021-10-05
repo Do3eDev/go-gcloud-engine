@@ -5,6 +5,7 @@ import (
 	"cloud.google.com/go/storage"
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -57,8 +58,8 @@ func StorageCreateFileSVG(Env string, request *http.Request, Bucket, fileName st
 }
 
 func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fList []struct {
-	Name string `json:"name"`
-	Data []byte `json:"data"`
+	Name string      `json:"name"`
+	Data interface{} `json:"data"`
 }) {
 	if Env == "local" {
 		return
@@ -75,8 +76,9 @@ func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fL
 		var ws = client.Bucket(Bucket).Object(v.Name).NewWriter(ctx)
 		ws.ContentType = "application/json"
 		ws.ContentEncoding = "gzip"
+		sbd1, _ := json.Marshal(v.Data)
 		var zw = gzip.NewWriter(buf)
-		_, _ = zw.Write(v.Data)
+		_, _ = zw.Write(sbd1)
 		_ = zw.Close()
 		_, _ = io.Copy(ws, buf)
 		_ = ws.Close()
