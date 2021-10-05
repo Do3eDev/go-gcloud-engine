@@ -85,16 +85,16 @@ func StorageCreateFileSVG(Url, Env string, request *http.Request, Bucket, fileNa
 }
 
 func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket string, fList []struct {
-	Name string `json:"name"`
-	Data []byte `json:"data"`
+	Name string      `json:"name"`
+	Data interface{} `json:"data"`
 }) {
 	Url += "/StorageCreateMultiFile"
 
 	var data1 struct {
 		Bucket   string `json:"bucket"`
 		FileList []struct {
-			Name string `json:"name"`
-			Data []byte `json:"data"`
+			Name string      `json:"name"`
+			Data interface{} `json:"data"`
 		} `json:"file_list"`
 		TimeNow string `json:"time_now"`
 	}
