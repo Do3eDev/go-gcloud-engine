@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func StorageCreateFile(Env string, request *http.Request, Bucket, fileName string, content []byte) {
+func StorageCreateFile(Url, Env string, request *http.Request, Bucket, fileName string, content []byte) {
 	if Env == "local" {
 		return
 	}
@@ -32,7 +32,7 @@ func StorageCreateFile(Env string, request *http.Request, Bucket, fileName strin
 	_ = ws.Close()
 }
 
-func StorageCreateFileSVG(Env string, request *http.Request, Bucket, fileName string, content []byte) {
+func StorageCreateFileSVG(Url, Env string, request *http.Request, Bucket, fileName string, content []byte) {
 	if Env == "local" {
 		return
 	}
@@ -54,7 +54,7 @@ func StorageCreateFileSVG(Env string, request *http.Request, Bucket, fileName st
 	_ = ws.Close()
 }
 
-func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fList []struct {
+func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket string, fList []struct {
 	Name string
 	Data []byte
 }) {
@@ -81,7 +81,7 @@ func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fL
 	}
 }
 
-func StorageDeleteFile(Env string, request *http.Request, Bucket string, fileName string) {
+func StorageDeleteFile(Url, Env string, request *http.Request, Bucket string, fileName string) {
 	if Env == "local" {
 		return
 	}
@@ -96,7 +96,10 @@ func StorageDeleteFile(Env string, request *http.Request, Bucket string, fileNam
 	return
 }
 
-func StorageReadFile(Env string, request *http.Request, Bucket string, fileName string) ([]byte, error) {
+func StorageReadFile(Url, Env string, request *http.Request, Bucket string, fileName string) ([]byte, error) {
+	if Env == "local" {
+		return nil, nil
+	}
 	var ctx = appengine.NewContext(request)
 	var client, err = storage.NewClient(ctx)
 	if err != nil {
@@ -113,7 +116,7 @@ func StorageReadFile(Env string, request *http.Request, Bucket string, fileName 
 	return ioutil.ReadAll(rc)
 }
 
-func StorageCheckFile(Env string, request *http.Request, Bucket string, fileName string) bool {
+func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fileName string) bool {
 	if Env == "local" {
 		return false
 	}
@@ -131,7 +134,7 @@ func StorageCheckFile(Env string, request *http.Request, Bucket string, fileName
 	return true
 }
 
-func StorageDeleteMultiFile(Env string, request *http.Request, Bucket string, array1 []string) {
+func StorageDeleteMultiFile(Url, Env string, request *http.Request, Bucket string, array1 []string) {
 	if Env == "local" {
 		return
 	}
