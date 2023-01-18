@@ -1,149 +1,169 @@
 package go_gcloud_engine
 
 import (
-	"bytes"
-	"cloud.google.com/go/storage"
-	"compress/gzip"
-	"google.golang.org/appengine"
-	"io"
-	"io/ioutil"
+	"encoding/json"
 	"net/http"
+	"time"
 )
 
-func StorageCreateFile(Env string, request *http.Request, Bucket, fileName string, content []byte) {
-	if Env == "local" {
-		return
+func StorageCreateFile(
+	Url, Env string,
+	request *http.Request,
+	Bucket, fileName string,
+	content []byte,
+) {
+	Url += "/StorageCreateFile"
+
+	var data1 struct {
+		Bucket   string      `json:"bucket"`
+		FileName string      `json:"file_name"`
+		Content  interface{} `json:"content"`
+		TimeNow  string      `json:"time_now"`
 	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	var buf = &bytes.Buffer{}
-	var ws = client.Bucket(Bucket).Object(fileName).NewWriter(ctx)
-	ws.ContentType = "application/json"
-	ws.ContentEncoding = "gzip"
-	var zw = gzip.NewWriter(buf)
-	_, _ = zw.Write(content)
-	_ = zw.Close()
-	_, _ = io.Copy(ws, buf)
-	_ = ws.Close()
+
+	data1.Bucket = Bucket
+	data1.FileName = fileName
+	_ = json.Unmarshal(content, &data1.Content)
+	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+
+	var body1, _ = json.Marshal(data1)
+	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 }
 
-func StorageCreateFileSVG(Env string, request *http.Request, Bucket, fileName string, content []byte) {
-	if Env == "local" {
-		return
+func StorageCreateFileSVG(
+	Url, Env string,
+	request *http.Request,
+	Bucket, fileName string,
+	content []byte,
+) {
+	Url += "/StorageCreateFileSVG"
+
+	var data1 struct {
+		Bucket   string      `json:"bucket"`
+		FileName string      `json:"file_name"`
+		Content  interface{} `json:"content"`
+		TimeNow  string      `json:"time_now"`
 	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	var buf = &bytes.Buffer{}
-	var ws = client.Bucket(Bucket).Object(fileName).NewWriter(ctx)
-	ws.ContentType = "image/svg+xml"
-	ws.ContentEncoding = "gzip"
-	var zw = gzip.NewWriter(buf)
-	_, _ = zw.Write(content)
-	_ = zw.Close()
-	_, _ = io.Copy(ws, buf)
-	_ = ws.Close()
+
+	data1.Bucket = Bucket
+	data1.FileName = fileName
+	_ = json.Unmarshal(content, &data1.Content)
+	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+
+	var body1, _ = json.Marshal(data1)
+	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 }
 
-func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fList []struct {
-	Name string
-	Data []byte
+func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket string, fList []struct {
+	Name string      `json:"name"`
+	Data interface{} `json:"data"`
 }) {
-	if Env == "local" {
-		return
+	Url += "/StorageCreateMultiFile"
+
+	var data1 struct {
+		Bucket   string `json:"bucket"`
+		FileList []struct {
+			Name string      `json:"name"`
+			Data interface{} `json:"data"`
+		} `json:"file_list"`
+		TimeNow string `json:"time_now"`
 	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	for _, v := range fList {
-		var buf = &bytes.Buffer{}
-		var ws = client.Bucket(Bucket).Object(v.Name).NewWriter(ctx)
-		ws.ContentType = "application/json"
-		ws.ContentEncoding = "gzip"
-		var zw = gzip.NewWriter(buf)
-		_, _ = zw.Write(v.Data)
-		_ = zw.Close()
-		_, _ = io.Copy(ws, buf)
-		_ = ws.Close()
-	}
+
+	data1.Bucket = Bucket
+	data1.FileList = fList
+	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+
+	var body1, _ = json.Marshal(data1)
+	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 }
 
-func StorageDeleteFile(Env string, request *http.Request, Bucket string, fileName string) {
-	if Env == "local" {
-		return
+func StorageDeleteFile(Url, Env string, request *http.Request, Bucket string, fileName string) {
+	Url += "/StorageDeleteFile"
+
+	var data1 struct {
+		Bucket   string `json:"bucket"`
+		FileName string `json:"file_name"`
+		TimeNow  string `json:"time_now"`
 	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	_ = client.Bucket(Bucket).Object(fileName).Delete(ctx)
+
+	data1.Bucket = Bucket
+	data1.FileName = fileName
+	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+
+	var body1, _ = json.Marshal(data1)
+	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 	return
 }
 
-func StorageReadFile(Env string, request *http.Request, Bucket string, fileName string) ([]byte, error) {
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return nil, err
-	} else {
-		defer client.Close()
+func StorageReadFile(
+	Url, Env string,
+	request *http.Request,
+	Bucket string,
+	fileName string,
+) ([]byte, error) {
+	Url += "/StorageReadFile"
+
+	var data1 struct {
+		Bucket   string `json:"bucket"`
+		FileName string `json:"file_name"`
+		TimeNow  string `json:"time_now"`
 	}
-	rc, err := client.Bucket(Bucket).Object(fileName).NewReader(ctx)
-	if err != nil {
-		return nil, err
-	} else {
-		defer rc.Close()
-	}
-	return ioutil.ReadAll(rc)
+
+	data1.Bucket = Bucket
+	data1.FileName = fileName
+	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+
+	var body1, _ = json.Marshal(data1)
+	_, body2, err2, _ := RequestCustomer(Env, "POST", Url, body1, nil, request)
+	return body2, err2
 }
 
-func StorageCheckFile(Env string, request *http.Request, Bucket string, fileName string) bool {
-	if Env == "local" {
-		return false
+func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fileName string) bool {
+	Url += "/StorageCheckFile"
+
+	var data1 struct {
+		Bucket   string `json:"bucket"`
+		FileName string `json:"file_name"`
+		TimeNow  string `json:"time_now"`
 	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return false
-	} else {
-		defer client.Close()
+
+	data1.Bucket = Bucket
+	data1.FileName = fileName
+	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+
+	var body1, _ = json.Marshal(data1)
+	_, body2, err2, _ := RequestCustomer(Env, "POST", Url, body1, nil, request)
+
+	var result struct {
+		Success bool `json:"success"`
 	}
-	_, err = client.Bucket(Bucket).Object(fileName).NewReader(ctx)
-	if err != nil {
-		return false
+
+	if err2 == nil {
+		_ = json.Unmarshal(body2, &result)
 	}
-	return true
+
+	return result.Success
 }
 
-func StorageDeleteMultiFile(Env string, request *http.Request, Bucket string, array1 []string) {
-	if Env == "local" {
-		return
+func StorageDeleteMultiFile(
+	Url, Env string,
+	request *http.Request,
+	Bucket string,
+	array1 []string,
+) {
+	Url += "/StorageDeleteMultiFile"
+
+	var data1 struct {
+		Bucket     string   `json:"bucket"`
+		ListDelete []string `json:"list_delete"`
+		TimeNow    string   `json:"time_now"`
 	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	for _, v := range array1 {
-		_ = client.Bucket(Bucket).Object(v).Delete(ctx)
-	}
+
+	data1.Bucket = Bucket
+	data1.ListDelete = array1
+	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+
+	var body1, _ = json.Marshal(data1)
+	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 	return
 }
