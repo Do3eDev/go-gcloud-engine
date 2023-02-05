@@ -2,7 +2,6 @@ package go_gcloud_engine
 
 import (
 	"net/http"
-	"time"
 )
 
 func MemCacheDelete(Env string, request *http.Request, key string) bool {
@@ -17,14 +16,14 @@ func MemCacheAdd(
 	request *http.Request,
 	key string,
 	value []byte,
-	minute time.Duration,
+	minute int,
 ) bool {
 	if !MemcachePing {
 		return false
 	}
 	if AddCache(MemcacheConnection, key, value) == nil {
 		if minute > 0 {
-			return TouchCache(MemcacheConnection, key, int(minute*60)) == nil
+			return TouchCache(MemcacheConnection, key, minute*60) == nil
 		}
 	}
 	return true
@@ -35,7 +34,7 @@ func MemCacheAddRandom(
 	request *http.Request,
 	key string,
 	value []byte,
-	minute time.Duration,
+	minute int,
 ) bool {
 	return MemCacheAdd(Env, request, key, value, minute)
 }
@@ -45,14 +44,14 @@ func MemCacheAddSecond(
 	request *http.Request,
 	key string,
 	value []byte,
-	second time.Duration,
+	second int,
 ) bool {
 	if !MemcachePing {
 		return false
 	}
 	if AddCache(MemcacheConnection, key, value) == nil {
 		if second > 0 {
-			return TouchCache(MemcacheConnection, key, int(second)) == nil
+			return TouchCache(MemcacheConnection, key, second) == nil
 		}
 	}
 	return true
@@ -63,14 +62,14 @@ func MemCacheSet(
 	request *http.Request,
 	key string,
 	value []byte,
-	minute time.Duration,
+	minute int,
 ) bool {
 	if !MemcachePing {
 		return false
 	}
 	if SetCache(MemcacheConnection, key, value) == nil {
 		if minute > 0 {
-			return TouchCache(MemcacheConnection, key, int(minute*60)) == nil
+			return TouchCache(MemcacheConnection, key, minute*60) == nil
 		}
 	}
 	return true
@@ -81,14 +80,14 @@ func MemCacheSetSecond(
 	request *http.Request,
 	key string,
 	value []byte,
-	second time.Duration,
+	second int,
 ) bool {
 	if !MemcachePing {
 		return false
 	}
 	if SetCache(MemcacheConnection, key, value) == nil {
 		if second > 0 {
-			return TouchCache(MemcacheConnection, key, int(second)) == nil
+			return TouchCache(MemcacheConnection, key, second) == nil
 		}
 	}
 	return true
