@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -19,11 +20,14 @@ func StorageCreateFile(
 ) {
 	var thisTmp = "/var/www/" + Bucket
 	var folderName = filepath.Dir("/" + fileName)
-	if _, err := os.Stat(thisTmp); os.IsNotExist(err) {
-		_ = os.Mkdir(thisTmp, 0755)
-	}
-	if _, err := os.Stat(thisTmp + folderName); os.IsNotExist(err) {
-		_ = os.Mkdir(thisTmp+folderName, 0755)
+	var thisPath = ""
+	for _, folderName := range strings.Split(folderName, "/") {
+		if folderName != "" {
+			thisPath += "/" + folderName
+			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
+				_ = os.Mkdir(thisPath, 0755)
+			}
+		}
 	}
 	reSTT, errTT := os.Create(thisTmp + "/" + fileName)
 	if errTT == nil {
