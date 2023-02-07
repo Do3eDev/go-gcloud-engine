@@ -18,7 +18,7 @@ func StorageCreateFile(
 	Bucket, fileName string,
 	content []byte,
 ) {
-	var thisTmp = "/var/www/" + Bucket
+	var thisTmp = "/var/www/autoketing-storage/" + Bucket
 	var folderName = filepath.Dir("/" + fileName)
 	var thisPath = ""
 	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
