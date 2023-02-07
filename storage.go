@@ -19,9 +19,9 @@ func StorageCreateFile(
 ) {
 	var thisTmp = "/var/www/" + Bucket
 	var folderName = filepath.Dir("/" + fileName)
-	//if _, err := os.Stat(thisTmp); os.IsNotExist(err) {
-	//	_ = os.Mkdir(thisTmp, 0755)
-	//}
+	if _, err := os.Stat(thisTmp); os.IsNotExist(err) {
+		_ = os.Mkdir(thisTmp, 0755)
+	}
 	if _, err := os.Stat(thisTmp + folderName); os.IsNotExist(err) {
 		_ = os.Mkdir(thisTmp+folderName, 0755)
 	}
