@@ -1,9 +1,7 @@
 package go_gcloud_engine
 
 import (
-	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,10 +35,7 @@ func StorageCreateFile(
 	} else {
 		f, err := os.Open(filePath)
 		if err == nil {
-			var buf = &bytes.Buffer{}
-			buf.Write(content)
-			_, _ = io.Copy(f, buf)
-			//_, _ = f.Write(content)
+			_, _ = f.Write(content)
 		}
 	}
 
