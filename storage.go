@@ -27,7 +27,7 @@ func StorageCreateFile(
 		}
 	}
 	var filePath = thisTmp + "/" + fileName
-	f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+	f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_WRONLY, 0755)
 	if err == nil {
 		_, _ = f.Write(content)
 	}
