@@ -1,8 +1,13 @@
 package go_gcloud_engine
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -12,6 +17,23 @@ func StorageCreateFile(
 	Bucket, fileName string,
 	content []byte,
 ) {
+	var thisTmp = "/var/www/" + Bucket
+	var folderName = filepath.Dir("/" + fileName)
+	//if _, err := os.Stat(thisTmp); os.IsNotExist(err) {
+	//	_ = os.Mkdir(thisTmp, 0755)
+	//}
+	if _, err := os.Stat(thisTmp + folderName); os.IsNotExist(err) {
+		_ = os.Mkdir(thisTmp+folderName, 0755)
+	}
+	reSTT, errTT := os.Create(thisTmp + "/" + fileName)
+	if errTT == nil {
+		var buf = &bytes.Buffer{}
+		var zw = gzip.NewWriter(buf)
+		_, _ = zw.Write(content)
+		_ = zw.Close()
+		_, _ = io.Copy(reSTT, buf)
+	}
+
 	Url += "/StorageCreateFile"
 
 	var data1 struct {
