@@ -26,7 +26,7 @@ func StorageCreateFile(
 			}
 		}
 	}
-	f, err := os.OpenFile(thisTmp+"/"+fileName, os.O_RDWR|os.O_CREATE, 0755)
+	f, err := os.OpenFile(thisTmp+"/"+fileName, os.O_WRONLY|os.O_CREATE, 0755)
 	if err == nil {
 		_, _ = f.Write(content)
 	}
