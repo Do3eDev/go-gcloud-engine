@@ -21,7 +21,7 @@ func StorageCreateFile(
 	var thisTmp = "/var/www/" + Bucket
 	var folderName = filepath.Dir("/" + fileName)
 	var thisPath = ""
-	for _, folderName := range strings.Split(folderName, "/") {
+	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
 		if folderName != "" {
 			thisPath += "/" + folderName
 			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
