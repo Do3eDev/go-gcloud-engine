@@ -3,6 +3,9 @@ package go_gcloud_engine
 import (
 	"encoding/json"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -12,6 +15,27 @@ func StorageCreateFile(
 	Bucket, fileName string,
 	content []byte,
 ) {
+	var thisTmp = "/var/www/autoketing-storage/" + Bucket
+	var folderName = filepath.Dir("/" + fileName)
+	var thisPath = ""
+	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
+		if folderName != "" {
+			thisPath += "/" + folderName
+			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
+				_ = os.Mkdir(thisPath, 0755)
+			}
+		}
+	}
+	var filePath = thisTmp + "/" + fileName
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+		if err == nil {
+			_, _ = f.Write(content)
+		}
+	} else {
+		_ = os.WriteFile(filePath, content, 0644)
+	}
+
 	Url += "/StorageCreateFile"
 
 	var data1 struct {
@@ -36,6 +60,27 @@ func StorageCreateFileSVG(
 	Bucket, fileName string,
 	content []byte,
 ) {
+	var thisTmp = "/var/www/autoketing-storage/" + Bucket
+	var folderName = filepath.Dir("/" + fileName)
+	var thisPath = ""
+	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
+		if folderName != "" {
+			thisPath += "/" + folderName
+			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
+				_ = os.Mkdir(thisPath, 0755)
+			}
+		}
+	}
+	var filePath = thisTmp + "/" + fileName
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+		if err == nil {
+			_, _ = f.Write(content)
+		}
+	} else {
+		_ = os.WriteFile(filePath, content, 0644)
+	}
+
 	Url += "/StorageCreateFileSVG"
 
 	var data1 struct {
@@ -58,6 +103,31 @@ func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket strin
 	Name string      `json:"name"`
 	Data interface{} `json:"data"`
 }) {
+	for _, s := range fList {
+		content, _ := json.Marshal(s.Data)
+		fileName := s.Name
+		var thisTmp = "/var/www/autoketing-storage/" + Bucket
+		var folderName = filepath.Dir("/" + fileName)
+		var thisPath = ""
+		for _, folderName := range strings.Split(thisTmp+folderName, "/") {
+			if folderName != "" {
+				thisPath += "/" + folderName
+				if _, err := os.Stat(thisPath); os.IsNotExist(err) {
+					_ = os.Mkdir(thisPath, 0755)
+				}
+			}
+		}
+		var filePath = thisTmp + "/" + fileName
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+			if err == nil {
+				_, _ = f.Write(content)
+			}
+		} else {
+			_ = os.WriteFile(filePath, content, 0644)
+		}
+	}
+
 	Url += "/StorageCreateMultiFile"
 
 	var data1 struct {
