@@ -36,6 +36,7 @@ func StorageCreateFile(
 		_ = os.WriteFile(filePath, content, 0644)
 	}
 
+	return
 	Url += "/StorageCreateFile"
 
 	var data1 struct {
@@ -81,6 +82,7 @@ func StorageCreateFileSVG(
 		_ = os.WriteFile(filePath, content, 0644)
 	}
 
+	return
 	Url += "/StorageCreateFileSVG"
 
 	var data1 struct {
@@ -128,6 +130,7 @@ func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket strin
 		}
 	}
 
+	return
 	Url += "/StorageCreateMultiFile"
 
 	var data1 struct {
@@ -148,6 +151,7 @@ func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket strin
 }
 
 func StorageDeleteFile(Url, Env string, request *http.Request, Bucket string, fileName string) {
+	return
 	Url += "/StorageDeleteFile"
 
 	var data1 struct {
@@ -171,6 +175,7 @@ func StorageReadFile(
 	Bucket string,
 	fileName string,
 ) ([]byte, error) {
+	return nil, nil
 	Url += "/StorageReadFile"
 
 	var data1 struct {
@@ -189,28 +194,45 @@ func StorageReadFile(
 }
 
 func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fileName string) bool {
-	Url += "/StorageCheckFile"
-
-	var data1 struct {
-		Bucket   string `json:"bucket"`
-		FileName string `json:"file_name"`
-		TimeNow  string `json:"time_now"`
+	var checked bool
+	var thisTmp = "/var/www/autoketing-storage/" + Bucket
+	var folderName = filepath.Dir("/" + fileName)
+	var thisPath = ""
+	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
+		if folderName != "" {
+			thisPath += "/" + folderName
+			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
+				//_ = os.Mkdir(thisPath, 0755)
+			} else {
+				checked = true
+			}
+		}
 	}
 
-	data1.Bucket = Bucket
-	data1.FileName = fileName
-	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-
-	var body1, _ = json.Marshal(data1)
-	_, body2, err2, _ := RequestCustomer(Env, "POST", Url, body1, nil, request)
+	//Url += "/StorageCheckFile"
+	//
+	//var data1 struct {
+	//	Bucket   string `json:"bucket"`
+	//	FileName string `json:"file_name"`
+	//	TimeNow  string `json:"time_now"`
+	//}
+	//
+	//data1.Bucket = Bucket
+	//data1.FileName = fileName
+	//data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
+	//
+	//var body1, _ = json.Marshal(data1)
+	//_, body2, err2, _ := RequestCustomer(Env, "POST", Url, body1, nil, request)
 
 	var result struct {
 		Success bool `json:"success"`
 	}
 
-	if err2 == nil {
-		_ = json.Unmarshal(body2, &result)
-	}
+	result.Success = checked
+
+	//if err2 == nil {
+	//	_ = json.Unmarshal(body2, &result)
+	//}
 
 	return result.Success
 }
@@ -221,6 +243,7 @@ func StorageDeleteMultiFile(
 	Bucket string,
 	array1 []string,
 ) {
+	return
 	Url += "/StorageDeleteMultiFile"
 
 	var data1 struct {
