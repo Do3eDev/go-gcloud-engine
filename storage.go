@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
-	"time"
 )
 
 func StorageCreateFile(
@@ -16,17 +14,9 @@ func StorageCreateFile(
 	content []byte,
 ) {
 	var thisTmp = "/var/www/autoketing-storage/" + Bucket
-	var folderName = filepath.Dir("/" + fileName)
-	var thisPath = ""
-	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
-		if folderName != "" {
-			thisPath += "/" + folderName
-			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
-				_ = os.Mkdir(thisPath, 0755)
-			}
-		}
-	}
 	var filePath = thisTmp + "/" + fileName
+	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
+
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
 		if err == nil {
@@ -35,24 +25,6 @@ func StorageCreateFile(
 	} else {
 		_ = os.WriteFile(filePath, content, 0644)
 	}
-
-	return
-	Url += "/StorageCreateFile"
-
-	var data1 struct {
-		Bucket   string      `json:"bucket"`
-		FileName string      `json:"file_name"`
-		Content  interface{} `json:"content"`
-		TimeNow  string      `json:"time_now"`
-	}
-
-	data1.Bucket = Bucket
-	data1.FileName = fileName
-	_ = json.Unmarshal(content, &data1.Content)
-	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-
-	var body1, _ = json.Marshal(data1)
-	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 }
 
 func StorageCreateFileSVG(
@@ -62,17 +34,9 @@ func StorageCreateFileSVG(
 	content []byte,
 ) {
 	var thisTmp = "/var/www/autoketing-storage/" + Bucket
-	var folderName = filepath.Dir("/" + fileName)
-	var thisPath = ""
-	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
-		if folderName != "" {
-			thisPath += "/" + folderName
-			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
-				_ = os.Mkdir(thisPath, 0755)
-			}
-		}
-	}
 	var filePath = thisTmp + "/" + fileName
+	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
+
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
 		if err == nil {
@@ -81,24 +45,6 @@ func StorageCreateFileSVG(
 	} else {
 		_ = os.WriteFile(filePath, content, 0644)
 	}
-
-	return
-	Url += "/StorageCreateFileSVG"
-
-	var data1 struct {
-		Bucket   string      `json:"bucket"`
-		FileName string      `json:"file_name"`
-		Content  interface{} `json:"content"`
-		TimeNow  string      `json:"time_now"`
-	}
-
-	data1.Bucket = Bucket
-	data1.FileName = fileName
-	_ = json.Unmarshal(content, &data1.Content)
-	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-
-	var body1, _ = json.Marshal(data1)
-	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 }
 
 func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket string, fList []struct {
@@ -109,17 +55,9 @@ func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket strin
 		content, _ := json.Marshal(s.Data)
 		fileName := s.Name
 		var thisTmp = "/var/www/autoketing-storage/" + Bucket
-		var folderName = filepath.Dir("/" + fileName)
-		var thisPath = ""
-		for _, folderName := range strings.Split(thisTmp+folderName, "/") {
-			if folderName != "" {
-				thisPath += "/" + folderName
-				if _, err := os.Stat(thisPath); os.IsNotExist(err) {
-					_ = os.Mkdir(thisPath, 0755)
-				}
-			}
-		}
 		var filePath = thisTmp + "/" + fileName
+		_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
+
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
 			f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
 			if err == nil {
@@ -129,43 +67,9 @@ func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket strin
 			_ = os.WriteFile(filePath, content, 0644)
 		}
 	}
-
-	return
-	Url += "/StorageCreateMultiFile"
-
-	var data1 struct {
-		Bucket   string `json:"bucket"`
-		FileList []struct {
-			Name string      `json:"name"`
-			Data interface{} `json:"data"`
-		} `json:"file_list"`
-		TimeNow string `json:"time_now"`
-	}
-
-	data1.Bucket = Bucket
-	data1.FileList = fList
-	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-
-	var body1, _ = json.Marshal(data1)
-	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 }
 
 func StorageDeleteFile(Url, Env string, request *http.Request, Bucket string, fileName string) {
-	return
-	Url += "/StorageDeleteFile"
-
-	var data1 struct {
-		Bucket   string `json:"bucket"`
-		FileName string `json:"file_name"`
-		TimeNow  string `json:"time_now"`
-	}
-
-	data1.Bucket = Bucket
-	data1.FileName = fileName
-	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-
-	var body1, _ = json.Marshal(data1)
-	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 	return
 }
 
@@ -176,65 +80,17 @@ func StorageReadFile(
 	fileName string,
 ) ([]byte, error) {
 	return nil, nil
-	Url += "/StorageReadFile"
-
-	var data1 struct {
-		Bucket   string `json:"bucket"`
-		FileName string `json:"file_name"`
-		TimeNow  string `json:"time_now"`
-	}
-
-	data1.Bucket = Bucket
-	data1.FileName = fileName
-	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-
-	var body1, _ = json.Marshal(data1)
-	_, body2, err2, _ := RequestCustomer(Env, "POST", Url, body1, nil, request)
-	return body2, err2
 }
 
 func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fileName string) bool {
 	var checked bool
 	var thisTmp = "/var/www/autoketing-storage/" + Bucket
-	var folderName = filepath.Dir("/" + fileName)
-	var thisPath = ""
-	for _, folderName := range strings.Split(thisTmp+folderName, "/") {
-		if folderName != "" {
-			thisPath += "/" + folderName
-			if _, err := os.Stat(thisPath); os.IsNotExist(err) {
-				//_ = os.Mkdir(thisPath, 0755)
-			} else {
-				checked = true
-			}
-		}
+	var filePath = thisTmp + "/" + fileName
+	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
+	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
+		checked = true
 	}
-
-	//Url += "/StorageCheckFile"
-	//
-	//var data1 struct {
-	//	Bucket   string `json:"bucket"`
-	//	FileName string `json:"file_name"`
-	//	TimeNow  string `json:"time_now"`
-	//}
-	//
-	//data1.Bucket = Bucket
-	//data1.FileName = fileName
-	//data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-	//
-	//var body1, _ = json.Marshal(data1)
-	//_, body2, err2, _ := RequestCustomer(Env, "POST", Url, body1, nil, request)
-
-	var result struct {
-		Success bool `json:"success"`
-	}
-
-	result.Success = checked
-
-	//if err2 == nil {
-	//	_ = json.Unmarshal(body2, &result)
-	//}
-
-	return result.Success
+	return checked
 }
 
 func StorageDeleteMultiFile(
@@ -243,20 +99,5 @@ func StorageDeleteMultiFile(
 	Bucket string,
 	array1 []string,
 ) {
-	return
-	Url += "/StorageDeleteMultiFile"
-
-	var data1 struct {
-		Bucket     string   `json:"bucket"`
-		ListDelete []string `json:"list_delete"`
-		TimeNow    string   `json:"time_now"`
-	}
-
-	data1.Bucket = Bucket
-	data1.ListDelete = array1
-	data1.TimeNow = time.Now().UTC().Format(time.RFC3339Nano)
-
-	var body1, _ = json.Marshal(data1)
-	_, _, _, _ = RequestCustomer(Env, "POST", Url, body1, nil, request)
 	return
 }
