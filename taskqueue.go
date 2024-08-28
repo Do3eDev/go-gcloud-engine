@@ -2,9 +2,14 @@ package go_gcloud_engine
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
+	"time"
+
+	"github.com/variar/buckets"
 )
 
 func AddNewTaskQueue(
@@ -14,17 +19,17 @@ func AddNewTaskQueue(
 	param url.Values,
 	queueName string,
 ) (task interface{}, err error) {
-	u, _ := url.ParseRequestURI(QueueService)
-	u.Path = fmt.Sprintf("/add-taskqueue/%s", queueName)
-	urlStr := u.String()
-
-	var client = &http.Client{}
-	r, _ := http.NewRequest(http.MethodPost, urlStr, strings.NewReader(param.Encode())) // URL-encoded payload
-	r.Header.Add("Authorization", fmt.Sprintf("auth_token=\"%s\"", Env))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	r.Header.Add("taskqueue", path)
-	r.Header.Add("request", request.Host)
-
-	_, err = client.Do(r)
+	if strings.TrimSpace(queueName) == "" {
+		queueName = "default"
+	}
+	var folder = fmt.Sprintf("queue/%s", time.Now().Format(time.DateOnly))
+	os.MkdirAll(folder, 0o755)
+	bx, _ := buckets.Open(fmt.Sprintf("%s/%s.queue", folder, queueName))
+	defer bx.Close()
+	todos, _ := bx.New([]byte("todos"))
+	sb1, err := io.ReadAll(strings.NewReader(param.Encode()))
+	if err == nil {
+		todos.Put([]byte(fmt.Sprintf("%d|||https://%s%s", time.Now().UnixNano(), request.Host, path)), sb1)
+	}
 	return
 }
