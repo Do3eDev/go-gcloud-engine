@@ -14,9 +14,11 @@ type AppMainConfig struct {
 	QueueService   string `json:"queue_service"`
 }
 
-var MemcacheConnection *memcache.Client
-var MemcachePing bool
-var QueueService string
+var (
+	MemcacheConnection *memcache.Client
+	MemcachePing       bool
+	QueueService       string
+)
 
 func AppEngineMain(config AppMainConfig) {
 	MemcacheConnection = memcache.New(config.Memcache.Servers...)
