@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func MemCacheDelete(Env string, request *http.Request, key string) bool {
+func MemCacheDelete(_ string, _ *http.Request, key string) bool {
 	if !MemcachePing {
 		return false
 	}
@@ -12,8 +12,8 @@ func MemCacheDelete(Env string, request *http.Request, key string) bool {
 }
 
 func MemCacheAdd(
-	Env string,
-	request *http.Request,
+	_ string,
+	_ *http.Request,
 	key string,
 	value []byte,
 	minute int,
@@ -40,8 +40,8 @@ func MemCacheAddRandom(
 }
 
 func MemCacheAddSecond(
-	Env string,
-	request *http.Request,
+	_ string,
+	_ *http.Request,
 	key string,
 	value []byte,
 	second int,
@@ -58,8 +58,8 @@ func MemCacheAddSecond(
 }
 
 func MemCacheSet(
-	Env string,
-	request *http.Request,
+	_ string,
+	_ *http.Request,
 	key string,
 	value []byte,
 	minute int,
@@ -76,8 +76,8 @@ func MemCacheSet(
 }
 
 func MemCacheSetSecond(
-	Env string,
-	request *http.Request,
+	_ string,
+	_ *http.Request,
 	key string,
 	value []byte,
 	second int,
@@ -93,7 +93,7 @@ func MemCacheSetSecond(
 	return true
 }
 
-func MemCacheGet(Env string, request *http.Request, key string) (value []byte, cache bool) {
+func MemCacheGet(_ string, _ *http.Request, key string) (value []byte, cache bool) {
 	if !MemcachePing {
 		return nil, false
 	}

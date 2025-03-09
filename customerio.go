@@ -43,7 +43,6 @@ func (c *CustomerIO) Identify(
 	attributes map[string]interface{},
 ) error {
 	j, err := json.Marshal(attributes)
-
 	if err != nil {
 		return err
 	}
@@ -66,10 +65,8 @@ func (c *CustomerIO) Track(
 	eventName string,
 	data map[string]interface{},
 ) error {
-
 	body := map[string]interface{}{"name": eventName, "data": data}
 	j, err := json.Marshal(body)
-
 	if err != nil {
 		return err
 	}
@@ -93,7 +90,6 @@ func (c *CustomerIO) TrackAnonymous(
 ) error {
 	body := map[string]interface{}{"name": eventName, "data": data}
 	j, err := json.Marshal(body)
-
 	if err != nil {
 		return err
 	}
@@ -145,7 +141,6 @@ func (c *CustomerIO) AddDevice(
 		body["device"][k] = v
 	}
 	j, err := json.Marshal(body)
-
 	if err != nil {
 		return err
 	}
@@ -215,7 +210,6 @@ func (c *CustomerIO) request(
 	body []byte,
 ) (status int, responseBody []byte, err error) {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
-
 	if err != nil {
 		return 0, nil, err
 	}
@@ -229,7 +223,6 @@ func (c *CustomerIO) request(
 
 	client := http.DefaultClient
 	resp, err = client.Do(req)
-
 	if err != nil {
 		return 0, nil, err
 	}
@@ -239,7 +232,7 @@ func (c *CustomerIO) request(
 
 	if resp.ContentLength >= 0 {
 		responseBody = make([]byte, resp.ContentLength)
-		resp.Body.Read(responseBody)
+		_, _ = resp.Body.Read(responseBody)
 	}
 
 	return status, responseBody, nil

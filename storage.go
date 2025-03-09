@@ -8,84 +8,85 @@ import (
 )
 
 func StorageCreateFile(
-	Url, Env string,
-	request *http.Request,
+	_, _ string,
+	_ *http.Request,
 	Bucket, fileName string,
 	content []byte,
 ) {
-	var thisTmp = "/var/www/autoketing-storage/" + Bucket
-	var filePath = thisTmp + "/" + fileName
+	thisTmp := "/var/www/autoketing-storage/" + Bucket
+	filePath := thisTmp + "/" + fileName
 	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0o644)
 		if err == nil {
 			_, _ = f.Write(content)
 		}
 	} else {
-		_ = os.WriteFile(filePath, content, 0644)
+		_ = os.WriteFile(filePath, content, 0o644)
 	}
 }
 
 func StorageCreateFileSVG(
-	Url, Env string,
-	request *http.Request,
+	_, _ string,
+	_ *http.Request,
 	Bucket, fileName string,
 	content []byte,
 ) {
-	var thisTmp = "/var/www/autoketing-storage/" + Bucket
-	var filePath = thisTmp + "/" + fileName
+	thisTmp := "/var/www/autoketing-storage/" + Bucket
+	filePath := thisTmp + "/" + fileName
 	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0o644)
 		if err == nil {
 			_, _ = f.Write(content)
 		}
 	} else {
-		_ = os.WriteFile(filePath, content, 0644)
+		_ = os.WriteFile(filePath, content, 0o644)
 	}
 }
 
-func StorageCreateMultiFile(Url, Env string, request *http.Request, Bucket string, fList []struct {
+func StorageCreateMultiFile(_, _ string, _ *http.Request, Bucket string, fList []struct {
 	Name string      `json:"name"`
 	Data interface{} `json:"data"`
-}) {
+},
+) {
 	for _, s := range fList {
 		content, _ := json.Marshal(s.Data)
 		fileName := s.Name
-		var thisTmp = "/var/www/autoketing-storage/" + Bucket
-		var filePath = thisTmp + "/" + fileName
+		thisTmp := "/var/www/autoketing-storage/" + Bucket
+		filePath := thisTmp + "/" + fileName
 		_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
 
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
-			f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+			f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0o644)
 			if err == nil {
 				_, _ = f.Write(content)
 			}
 		} else {
-			_ = os.WriteFile(filePath, content, 0644)
+			_ = os.WriteFile(filePath, content, 0o644)
 		}
 	}
 }
 
-func StorageDeleteFile(Url, Env string, request *http.Request, Bucket string, fileName string) {
+func StorageDeleteFile(_, _ string, _ *http.Request, _ string, _ string) {
 	return
 }
 
 func StorageReadFile(
-	Url, Env string,
-	request *http.Request,
-	Bucket string,
-	fileName string,
+	_, _ string,
+	_ *http.Request,
+	_ string,
+	_ string,
 ) ([]byte, error) {
 	return nil, nil
 }
 
-func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fileName string) bool {
+func StorageCheckFile(_, _ string, _ *http.Request, Bucket string, fileName string) bool {
 	var checked bool
-	var thisTmp = "/var/www/autoketing-storage/" + Bucket
-	var filePath = thisTmp + "/" + fileName
+	thisTmp := "/var/www/autoketing-storage/" + Bucket
+	filePath := thisTmp + "/" + fileName
 	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 		checked = true
@@ -94,10 +95,10 @@ func StorageCheckFile(Url, Env string, request *http.Request, Bucket string, fil
 }
 
 func StorageDeleteMultiFile(
-	Url, Env string,
-	request *http.Request,
-	Bucket string,
-	array1 []string,
+	_, _ string,
+	_ *http.Request,
+	_ string,
+	_ []string,
 ) {
 	return
 }

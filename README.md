@@ -1,4 +1,4 @@
-# go-gcloud-engine #re release
+# go-gcloud-engine
 
 ```go
 package main
