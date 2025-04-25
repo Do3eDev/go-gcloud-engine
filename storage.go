@@ -1,149 +1,104 @@
 package go_gcloud_engine
 
 import (
-	"bytes"
-	"cloud.google.com/go/storage"
-	"compress/gzip"
-	"google.golang.org/appengine"
-	"io"
-	"io/ioutil"
+	"encoding/json"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
-func StorageCreateFile(Env string, request *http.Request, Bucket, fileName string, content []byte) {
-	if Env == "local" {
-		return
-	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	var buf = &bytes.Buffer{}
-	var ws = client.Bucket(Bucket).Object(fileName).NewWriter(ctx)
-	ws.ContentType = "application/json"
-	ws.ContentEncoding = "gzip"
-	var zw = gzip.NewWriter(buf)
-	_, _ = zw.Write(content)
-	_ = zw.Close()
-	_, _ = io.Copy(ws, buf)
-	_ = ws.Close()
-}
+func StorageCreateFile(
+	_, _ string,
+	_ *http.Request,
+	Bucket, fileName string,
+	content []byte,
+) {
+	thisTmp := "/var/www/autoketing-storage/" + Bucket
+	filePath := thisTmp + "/" + fileName
+	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
 
-func StorageCreateFileSVG(Env string, request *http.Request, Bucket, fileName string, content []byte) {
-	if Env == "local" {
-		return
-	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0o644)
+		if err == nil {
+			_, _ = f.Write(content)
+		}
 	} else {
-		defer client.Close()
-	}
-	var buf = &bytes.Buffer{}
-	var ws = client.Bucket(Bucket).Object(fileName).NewWriter(ctx)
-	ws.ContentType = "image/svg+xml"
-	ws.ContentEncoding = "gzip"
-	var zw = gzip.NewWriter(buf)
-	_, _ = zw.Write(content)
-	_ = zw.Close()
-	_, _ = io.Copy(ws, buf)
-	_ = ws.Close()
-}
-
-func StorageCreateMultiFile(Env string, request *http.Request, Bucket string, fList []struct {
-	Name string
-	Data []byte
-}) {
-	if Env == "local" {
-		return
-	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	for _, v := range fList {
-		var buf = &bytes.Buffer{}
-		var ws = client.Bucket(Bucket).Object(v.Name).NewWriter(ctx)
-		ws.ContentType = "application/json"
-		ws.ContentEncoding = "gzip"
-		var zw = gzip.NewWriter(buf)
-		_, _ = zw.Write(v.Data)
-		_ = zw.Close()
-		_, _ = io.Copy(ws, buf)
-		_ = ws.Close()
+		_ = os.WriteFile(filePath, content, 0o644)
 	}
 }
 
-func StorageDeleteFile(Env string, request *http.Request, Bucket string, fileName string) {
-	if Env == "local" {
-		return
-	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
+func StorageCreateFileSVG(
+	_, _ string,
+	_ *http.Request,
+	Bucket, fileName string,
+	content []byte,
+) {
+	thisTmp := "/var/www/autoketing-storage/" + Bucket
+	filePath := thisTmp + "/" + fileName
+	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0o644)
+		if err == nil {
+			_, _ = f.Write(content)
+		}
 	} else {
-		defer client.Close()
+		_ = os.WriteFile(filePath, content, 0o644)
 	}
-	_ = client.Bucket(Bucket).Object(fileName).Delete(ctx)
+}
+
+func StorageCreateMultiFile(_, _ string, _ *http.Request, Bucket string, fList []struct {
+	Name string      `json:"name"`
+	Data interface{} `json:"data"`
+},
+) {
+	for _, s := range fList {
+		content, _ := json.Marshal(s.Data)
+		fileName := s.Name
+		thisTmp := "/var/www/autoketing-storage/" + Bucket
+		filePath := thisTmp + "/" + fileName
+		_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
+
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0o644)
+			if err == nil {
+				_, _ = f.Write(content)
+			}
+		} else {
+			_ = os.WriteFile(filePath, content, 0o644)
+		}
+	}
+}
+
+func StorageDeleteFile(_, _ string, _ *http.Request, _ string, _ string) {
 	return
 }
 
-func StorageReadFile(Env string, request *http.Request, Bucket string, fileName string) ([]byte, error) {
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return nil, err
-	} else {
-		defer client.Close()
-	}
-	rc, err := client.Bucket(Bucket).Object(fileName).NewReader(ctx)
-	if err != nil {
-		return nil, err
-	} else {
-		defer rc.Close()
-	}
-	return ioutil.ReadAll(rc)
+func StorageReadFile(
+	_, _ string,
+	_ *http.Request,
+	_ string,
+	_ string,
+) ([]byte, error) {
+	return nil, nil
 }
 
-func StorageCheckFile(Env string, request *http.Request, Bucket string, fileName string) bool {
-	if Env == "local" {
-		return false
+func StorageCheckFile(_, _ string, _ *http.Request, Bucket string, fileName string) bool {
+	var checked bool
+	thisTmp := "/var/www/autoketing-storage/" + Bucket
+	filePath := thisTmp + "/" + fileName
+	_ = os.MkdirAll(filepath.Dir(filePath), 0o755)
+	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
+		checked = true
 	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return false
-	} else {
-		defer client.Close()
-	}
-	_, err = client.Bucket(Bucket).Object(fileName).NewReader(ctx)
-	if err != nil {
-		return false
-	}
-	return true
+	return checked
 }
 
-func StorageDeleteMultiFile(Env string, request *http.Request, Bucket string, array1 []string) {
-	if Env == "local" {
-		return
-	}
-	var ctx = appengine.NewContext(request)
-	var client, err = storage.NewClient(ctx)
-	if err != nil {
-		return
-	} else {
-		defer client.Close()
-	}
-	for _, v := range array1 {
-		_ = client.Bucket(Bucket).Object(v).Delete(ctx)
-	}
+func StorageDeleteMultiFile(
+	_, _ string,
+	_ *http.Request,
+	_ string,
+	_ []string,
+) {
 	return
 }

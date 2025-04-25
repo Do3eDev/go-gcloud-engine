@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/urlfetch"
 	"net/http"
 	"path"
 	"strconv"
@@ -39,9 +37,12 @@ func NewCustomerIO(siteID, apiKey string, request *http.Request) *CustomerIO {
 }
 
 // Identify identifies a customer and sets their attributes
-func (c *CustomerIO) Identify(env string, customerID string, attributes map[string]interface{}) error {
+func (c *CustomerIO) Identify(
+	env string,
+	customerID string,
+	attributes map[string]interface{},
+) error {
 	j, err := json.Marshal(attributes)
-
 	if err != nil {
 		return err
 	}
@@ -58,11 +59,14 @@ func (c *CustomerIO) Identify(env string, customerID string, attributes map[stri
 }
 
 // Track sends a single event to Customer.io for the supplied user
-func (c *CustomerIO) Track(env string, customerID string, eventName string, data map[string]interface{}) error {
-
+func (c *CustomerIO) Track(
+	env string,
+	customerID string,
+	eventName string,
+	data map[string]interface{},
+) error {
 	body := map[string]interface{}{"name": eventName, "data": data}
 	j, err := json.Marshal(body)
-
 	if err != nil {
 		return err
 	}
@@ -79,10 +83,13 @@ func (c *CustomerIO) Track(env string, customerID string, eventName string, data
 }
 
 // TrackAnonymous sends a single event to Customer.io for the anonymous user
-func (c *CustomerIO) TrackAnonymous(env string, eventName string, data map[string]interface{}) error {
+func (c *CustomerIO) TrackAnonymous(
+	env string,
+	eventName string,
+	data map[string]interface{},
+) error {
 	body := map[string]interface{}{"name": eventName, "data": data}
 	j, err := json.Marshal(body)
-
 	if err != nil {
 		return err
 	}
@@ -112,7 +119,13 @@ func (c *CustomerIO) Delete(env string, customerID string) error {
 }
 
 // AddDevice adds a device for a customer
-func (c *CustomerIO) AddDevice(env string, customerID string, deviceID string, platform string, data map[string]interface{}) error {
+func (c *CustomerIO) AddDevice(
+	env string,
+	customerID string,
+	deviceID string,
+	platform string,
+	data map[string]interface{},
+) error {
 	if customerID == "" {
 		return errors.New("customerID is a required field")
 	}
@@ -128,7 +141,6 @@ func (c *CustomerIO) AddDevice(env string, customerID string, deviceID string, p
 		body["device"][k] = v
 	}
 	j, err := json.Marshal(body)
-
 	if err != nil {
 		return err
 	}
@@ -146,7 +158,12 @@ func (c *CustomerIO) AddDevice(env string, customerID string, deviceID string, p
 
 // DeleteDevice deletes a device for a customer
 func (c *CustomerIO) DeleteDevice(env string, customerID string, deviceID string) error {
-	status, responseBody, err := c.request(env, "DELETE", c.deleteDeviceURL(customerID, deviceID), []byte{})
+	status, responseBody, err := c.request(
+		env,
+		"DELETE",
+		c.deleteDeviceURL(customerID, deviceID),
+		[]byte{},
+	)
 
 	if err != nil {
 		return err
@@ -188,9 +205,11 @@ func (c *CustomerIO) deleteDeviceURL(customerID string, deviceID string) string 
 	return c.protocol() + path.Join(c.Host, "api/v1", "customers", customerID, "devices", deviceID)
 }
 
-func (c *CustomerIO) request(env, method, url string, body []byte) (status int, responseBody []byte, err error) {
+func (c *CustomerIO) request(
+	env, method, url string,
+	body []byte,
+) (status int, responseBody []byte, err error) {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
-
 	if err != nil {
 		return 0, nil, err
 	}
@@ -202,16 +221,8 @@ func (c *CustomerIO) request(env, method, url string, body []byte) (status int, 
 	// Declare resp with Response type
 	var resp *http.Response
 
-	// If not local env, using url fetch of Google app engine
-	if env != "local" {
-		ctx := appengine.NewContext(c.Request)
-		client := urlfetch.Client(ctx)
-		resp, err = client.Do(req)
-	} else {
-		client := http.DefaultClient
-		resp, err = client.Do(req)
-	}
-
+	client := http.DefaultClient
+	resp, err = client.Do(req)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -221,7 +232,7 @@ func (c *CustomerIO) request(env, method, url string, body []byte) (status int, 
 
 	if resp.ContentLength >= 0 {
 		responseBody = make([]byte, resp.ContentLength)
-		resp.Body.Read(responseBody)
+		_, _ = resp.Body.Read(responseBody)
 	}
 
 	return status, responseBody, nil

@@ -3,23 +3,27 @@ package go_gcloud_engine
 import (
 	"bytes"
 	"fmt"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
-func WriteLogError(Env string, request *http.Request, format string, err interface{}) {
+func WriteLogError(Env string, _ *http.Request, format string, err interface{}) {
 	if Env == "local" {
 		fmt.Println(format, err)
 	} else {
-		ctx := appengine.NewContext(request)
-		log.Errorf(ctx, format, err)
+		// ctx := appengine.NewContext(request)
+		// log.Errorf(ctx, format, err)
 	}
 }
 
-func RequestCustomer(Env string, method string, url string, body []byte, header map[string]string, request *http.Request) (status int, responseBody []byte, err error, Header map[string][]string) {
+func RequestCustomer(
+	_ string,
+	method string,
+	url string,
+	body []byte,
+	header map[string]string,
+	_ *http.Request,
+) (status int, responseBody []byte, err error, Header map[string][]string) {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	if err != nil {
 		status = 1
@@ -31,15 +35,8 @@ func RequestCustomer(Env string, method string, url string, body []byte, header 
 	}
 	var resp *http.Response
 
-	if Env != "local" {
-		ctx := appengine.NewContext(request)
-		client := urlfetch.Client(ctx)
-		resp, err = client.Do(req)
-	} else {
-		client := http.DefaultClient
-		resp, err = client.Do(req)
-	}
-
+	client := http.DefaultClient
+	resp, err = client.Do(req)
 	if err != nil {
 		status = 2
 		return
@@ -48,6 +45,6 @@ func RequestCustomer(Env string, method string, url string, body []byte, header 
 	defer resp.Body.Close()
 	status = resp.StatusCode
 	Header = resp.Header
-	responseBody, err = ioutil.ReadAll(resp.Body)
+	responseBody, err = io.ReadAll(resp.Body)
 	return
 }

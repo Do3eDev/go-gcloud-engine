@@ -1,18 +1,38 @@
 package go_gcloud_engine
 
 import (
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/taskqueue"
+	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/variar/buckets"
 )
 
-func AddNewTaskQueue(Env string, request *http.Request, path string, param url.Values, queueName string) (task *taskqueue.Task, err error) {
-	if Env == "local" {
-		return
+func AddNewTaskQueue(
+	_ string,
+	request *http.Request,
+	path string,
+	param url.Values,
+	queueName string,
+) (task interface{}, err error) {
+	if strings.TrimSpace(queueName) == "" {
+		queueName = "default"
 	}
-	return taskqueue.Add(
-		appengine.NewContext(request),
-		taskqueue.NewPOSTTask(path, param),
-		queueName)
+	folder := fmt.Sprintf("queue/%s", time.Now().Format(time.DateOnly))
+	_ = os.MkdirAll(folder, 0o755)
+	bx, _ := buckets.Open(fmt.Sprintf("%s/%s.queue", folder, queueName))
+	defer bx.Close()
+	todos, _ := bx.New([]byte("todos"))
+	sb1, err := io.ReadAll(strings.NewReader(param.Encode()))
+	if err == nil {
+		_ = todos.Put(
+			[]byte(fmt.Sprintf("%d|||https://%s%s", time.Now().UnixNano(), request.Host, path)),
+			sb1,
+		)
+	}
+	return
 }
